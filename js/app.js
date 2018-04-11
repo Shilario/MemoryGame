@@ -2,43 +2,52 @@
  * Create a list that holds all of your cards
  */
 let cardClasses = ['fa fa-bomb', 'fa fa-diamond', 'fa fa-paper-plane-o', 'fa fa-anchor', 'fa fa-bolt', 'fa fa-cube', 'fa fa-leaf', 'fa fa-bicycle'];
-let listOfCardClassses = cardClasses.concat(cardClasses);
+let startTime = 0;
 let moveCount = document.getElementsByClassName('moves');
-let ratingStars = document.getElementsByClassName('fa-star');
+let ratingStars = document.getElementsByClassName('list-star');
 let moves = 0;
-/*
- * Display the cards on the page
+
+/**
+ * Creates the board game, add classes to the list items
  *   - shuffle the list of cards using the provided "shuffle" method below
  *   - loop through each card and create its HTML
  *   - add each card's HTML to the page
+ * @param listOfCardClassses
  */
-function createCards() {
+function createCards(listOfCardClasses) {
     let cards = document.getElementsByClassName('card');
-
     for (let i = 0; i < cards.length; i++) {
         let newIcon = document.createElement('i');
-        let cardsShuffled = shuffle(listOfCardClassses);
 
+        let cardsShuffled = shuffle(listOfCardClasses);
         newIcon.className = cardsShuffled.pop();
-        cards.item(i).appendChild(newIcon);
 
+        cards.item(i).appendChild(newIcon);
         cards.item(i).addEventListener('click', function (e) {
             toggleOpenCard(e.target);
         });
     }
+
 }
 
+/**
+ * Toggles the classes whe cards are click
+ * @param e
+ */
 function toggleOpenCard(e) {
-    let startTime = performance.now();
+    if (startTime === 0){
+        startTime = performance.now();
+    }
+
     let endTime, totalTimeInGame;
     e.className = 'card open show';
     let cards = document.getElementsByClassName('show');
     let cardsMatch = document.getElementsByClassName('match');
 
-    if (cardsMatch.length === 16) {
-        createModal();
-        endTime = performance.now;
+    if (cardsMatch.length === 14 && cards.length === 2) {
+        endTime = performance.now();
         totalTimeInGame = endTime - startTime;
+        createModal(totalTimeInGame, ratingStars);
     };
 
     let firstCardChosen = cards.item(0).getElementsByClassName('fa').item(0);
@@ -67,18 +76,69 @@ function toggleOpenCard(e) {
     playerRating(moves);
 }
 
-function createModal() {
+/**
+ * Creates modal to be shown when the players wins
+ * @param playedTime
+ * @param stars
+ */
+function createModal(playedTime, stars) {
     let newModal = document.createElement('div');
     let newModalContent = document.createElement('div');
+    let contentHeader = document.createElement('h1');
+    let headerText = document.createTextNode('Congratulations, You Win!!!');
+
+    let divStars = document.createElement('div');
+    let starsHeader = document.createElement('h1');
+    let starsHeaderContent = document.createTextNode('Star Rating:');
+    let timePlayed = document.createElement('div');
+    timePlayed.innerText = playedTime;
+
+    let divTimePlayed = document.createElement('div');
+    let timePlayedHeader = document.createElement('h1');
+    let timePlayedHeaderContent = document.createTextNode('Time Played:');
+
+    let resetBtnDiv = document.createElement('div');
+    let resetBtn = document.createElement('button');
+    resetBtn.innerHTML = 'Reset Game';
+
+    contentHeader.appendChild(headerText);
+    starsHeader.appendChild(starsHeaderContent);
+    timePlayedHeader.appendChild(timePlayedHeaderContent);
+
     newModal.className = 'modal';
     newModalContent.className = 'modal-content';
+    divStars.className = 'start-rating';
+    divTimePlayed.className = 'time-played';
+    resetBtn.className = 'reset-btn';
+
+    divStars.appendChild(starsHeader);
+    divTimePlayed.appendChild(timePlayedHeader);
+    addStarsRating(stars.length, divStars);
+    divTimePlayed.appendChild(timePlayed);
+    resetBtnDiv.appendChild(resetBtn);
+
+
+    newModalContent.appendChild(contentHeader);
+    newModalContent.appendChild(divStars);
+    newModalContent.appendChild(divTimePlayed);
+    newModalContent.appendChild(resetBtnDiv);
 
     let modal = document.body.appendChild(newModal);
     modal.appendChild(newModalContent);
+
+    // Button tha restart the game after winning
+    resetBtn.addEventListener('click', function () {
+        restartGame();
+        let modal = document.getElementsByClassName('modal');
+        modal.item(0).remove();
+    });
 }
 
+/**
+ * Calculate the stars rating according to the amount of moves a playes has played.
+ * @param moves
+ */
 function playerRating(moves) {
-
     if (moves === 17 && ratingStars.length ===
         3) {
         ratingStars.item(0).remove();
@@ -89,8 +149,24 @@ function playerRating(moves) {
     }
 }
 
-function resetGame() {
-    createCards();
+/**
+ * Append the stars the user gain in the game after playing(modal)
+ * @param stars
+ * @param starsRatingContainer
+ */
+function addStarsRating(stars, starsRatingContainer) {
+    let starsContainer = document.createElement('div');
+    let starsList = document.createElement('ul');
+
+    starsContainer.appendChild(starsList);
+
+    for(let i=0; i < stars; i++) {
+        let starsElements = document.createElement('li');
+        starsElements.className = 'fa fa-star';
+        starsContainer.appendChild(starsElements);
+    }
+
+    starsRatingContainer.appendChild(starsContainer);
 }
 
 // Shuffle function from http://stackoverflow.com/a/2450976
@@ -108,8 +184,56 @@ function shuffle(array) {
     return array;
 }
 
-createCards();
+/**
+ * Reset game board. Remove children of the card's htmlCollection
+ */
+function clearBoard() {
+    let cards = document.getElementsByClassName('card');
 
+    for(let i = cards.length -1; i >= 0; i--) {
+        while(cards.item(i).firstChild) {
+            cards.item(i).className = 'card';
+            cards.item(i).removeChild(cards.item(i).firstChild);
+        }
+    }
+}
+
+/**
+ * Restart Game logic
+ */
+function restartGame() {
+    let classesForCards = cardClasses.concat(cardClasses);
+    startTime = 0;
+    moves = 0;
+    moveCount.item(0).innerHTML = moves;
+    let starsContainer = document.getElementsByClassName('stars');
+    let missingStars = 3 - ratingStars.length;
+
+    for (let i=0; i < missingStars; i++) {
+        let ratingContainerList = document.createElement('li');
+        ratingContainerList.className = 'list-star';
+        let starsElements = document.createElement('i');
+        starsElements.className = 'fa fa-star';
+
+        ratingContainerList.appendChild(starsElements);
+        starsContainer.item(0).appendChild(ratingContainerList);
+    }
+
+    clearBoard();
+    createCards(classesForCards);
+}
+
+$(document).ready(function () {
+    // Create initial board
+    let listOfCardClasses = cardClasses.concat(cardClasses);
+    createCards(listOfCardClasses);
+
+    //resets gaming board
+    let resetGameBtn = document.getElementsByClassName('fa fa-repeat');
+    resetGameBtn.item(0).addEventListener('click', function () {
+        restartGame();
+    });
+});
 /*
  * set up the event listener for a card. If a card is clicked:
  *  - display the card's symbol (put this functionality in another function that you call from this one)
