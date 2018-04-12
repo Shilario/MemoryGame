@@ -24,12 +24,8 @@ function createCards(listOfCardClasses) {
 
         cards.item(i).appendChild(newIcon);
 
-        cards.item(i).addEventListener('click', toggleOpenCard)
-        // cards.item(i).addEventListener('click', function (e) {
-        //     toggleOpenCard(e.target);
-        // });
+        cards.item(i).addEventListener('click', toggleOpenCard);
     }
-
 }
 
 /**
@@ -41,6 +37,12 @@ let toggleOpenCard = function (e) {
     if (startTime === 0){
         $("#timer").timer({seconds:0});
     }
+
+    if (element.className ==='card open show'  || element.className === 'card match') {
+        return;
+    }
+
+    moves++;
 
     element.className = 'card open show';
     let cards = document.getElementsByClassName('show');
@@ -61,18 +63,15 @@ let toggleOpenCard = function (e) {
 
     setTimeout(() =>{
         if (cards.length === 1) {
-            moves++;
-            element.className ='card open show';
+            element.className = 'card open show';
             moveCount.item(0).innerHTML = moves;
         } else if (firstCardChosen.classList.value === secondCardChosen.classList.value) {
             cards.item(1).className = 'card match';
             cards.item(0).className = 'card match';
-            moves++;
             moveCount.item(0).innerHTML = moves;
         } else {
             cards.item(1).className = 'card';
             cards.item(0).className = 'card';
-            moves++;
             moveCount.item(0).innerHTML = moves;
         }
     },250);
