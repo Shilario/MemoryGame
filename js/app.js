@@ -23,9 +23,11 @@ function createCards(listOfCardClasses) {
         newIcon.className = cardsShuffled.pop();
 
         cards.item(i).appendChild(newIcon);
-        cards.item(i).addEventListener('click', function (e) {
-            toggleOpenCard(e.target);
-        });
+
+        cards.item(i).addEventListener('click', toggleOpenCard)
+        // cards.item(i).addEventListener('click', function (e) {
+        //     toggleOpenCard(e.target);
+        // });
     }
 
 }
@@ -34,19 +36,19 @@ function createCards(listOfCardClasses) {
  * Toggles the classes whe cards are click
  * @param e
  */
-function toggleOpenCard(e) {
+let toggleOpenCard = function (e) {
+    let element = e.target;
     if (startTime === 0){
-        startTime = performance.now();
+        $("#timer").timer({seconds:0});
     }
 
-    let endTime, totalTimeInGame;
-    e.className = 'card open show';
+    element.className = 'card open show';
     let cards = document.getElementsByClassName('show');
     let cardsMatch = document.getElementsByClassName('match');
 
     if (cardsMatch.length === 14 && cards.length === 2) {
-        endTime = performance.now();
-        totalTimeInGame = endTime - startTime;
+        let totalTimeInGame = $("#timer").data('seconds');
+        $("#timer").timer('remove');
         createModal(totalTimeInGame, ratingStars);
     };
 
@@ -56,10 +58,11 @@ function toggleOpenCard(e) {
     if (cards.length != 1) {
         secondCardChosen = cards.item(1).getElementsByClassName('fa').item(0);
     }
+
     setTimeout(() =>{
         if (cards.length === 1) {
             moves++;
-            e.className ='card open show';
+            element.className ='card open show';
             moveCount.item(0).innerHTML = moves;
         } else if (firstCardChosen.classList.value === secondCardChosen.classList.value) {
             cards.item(1).className = 'card match';
@@ -193,6 +196,7 @@ function clearBoard() {
     for(let i = cards.length -1; i >= 0; i--) {
         while(cards.item(i).firstChild) {
             cards.item(i).className = 'card';
+            cards.item(i).removeEventListener('click', toggleOpenCard)
             cards.item(i).removeChild(cards.item(i).firstChild);
         }
     }
@@ -221,6 +225,7 @@ function restartGame() {
 
     clearBoard();
     createCards(classesForCards);
+    $("#timer").timer('remove');
 }
 
 $(document).ready(function () {

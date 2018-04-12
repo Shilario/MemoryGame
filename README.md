@@ -7,6 +7,7 @@ all upside down, at least at the beginning, where you need to match pairs of car
 
 * [Instructions](#instructions)
 * [Rating](#rating)
+* [Dependencies](#dependencies)
 
 ## Instructions
 This game has one simple rule, you just need to follow the next step and you ready to start the fun:
@@ -26,3 +27,10 @@ You can find a rating star punctuation in the game that will be display right ab
 This one will be decrease the amount of stars you have while you increase the amount of movement in the game.
 
 
+## Dependencies
+Here is the list of dependencies for this project:
+
+* Jquery 3.3.1
+* Bootstrap 
+* Google Fonts
+* jQuery Timer plugin
