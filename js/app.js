@@ -212,6 +212,7 @@ function restartGame() {
     moveCount.item(0).innerHTML = moves;
     let starsContainer = document.getElementsByClassName('stars');
     let missingStars = 3 - ratingStars.length;
+    $("input").val("0 sec");
 
     for (let i=0; i < missingStars; i++) {
         let ratingContainerList = document.createElement('li');
